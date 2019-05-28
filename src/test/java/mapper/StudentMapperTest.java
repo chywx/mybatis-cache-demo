@@ -93,8 +93,7 @@ public class StudentMapperTest {
     }
 
     /**
-     *  <setting name="localCacheScope" value="SESSION"/>
-     *  <setting name="cacheEnabled" value="true"/>
+     *  并不会走缓存
      * @throws Exception
      */
     @Test
@@ -111,8 +110,7 @@ public class StudentMapperTest {
     }
 
     /**
-     *  <setting name="localCacheScope" value="SESSION"/>
-     *  <setting name="cacheEnabled" value="true"/>
+     *  关闭才走缓存
      * @throws Exception
      */
     @Test
@@ -150,14 +148,15 @@ public class StudentMapperTest {
         sqlSession1.close();
         System.out.println("studentMapper2读取数据: " + studentMapper2.getStudentById(1));
 
-        studentMapper3.updateStudentName("方方",1);
+        studentMapper3.updateStudentName("哈哈",1);
+//        如果进行提交，那么下面的查询会走数据库如果不提交，那走的就是缓存，查询出来的数据有问题
         sqlSession3.commit();
         System.out.println("studentMapper2读取数据: " + studentMapper2.getStudentById(1));
     }
 
     /**
-     *  <setting name="localCacheScope" value="SESSION"/>
-     *  <setting name="cacheEnabled" value="true"/>
+     *  表连接的话，即使不是同一个是sqslSession，也会走缓存
+     *  如果你进行了修改单个表，照样会走缓存，所以表连接还是别走缓存好
      * @throws Exception
      */
     @Test
@@ -166,11 +165,9 @@ public class StudentMapperTest {
         SqlSession sqlSession2 = factory.openSession(true); // 自动提交事务
         SqlSession sqlSession3 = factory.openSession(true); // 自动提交事务
 
-
         StudentMapper studentMapper = sqlSession1.getMapper(StudentMapper.class);
         StudentMapper studentMapper2 = sqlSession2.getMapper(StudentMapper.class);
         ClassMapper classMapper = sqlSession3.getMapper(ClassMapper.class);
-
 
         System.out.println("studentMapper读取数据: " + studentMapper.getStudentByIdWithClassInfo(1));
         sqlSession1.close();
